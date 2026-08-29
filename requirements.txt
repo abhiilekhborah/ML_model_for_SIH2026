@@ -5,3 +5,5 @@ pydantic
 pytesseract
 Pillow
 pypdf
+google-generativeai
+python-dotenv

@@ -51,6 +51,30 @@ class DocumentExtractor:
             return "Patient: John Doe\nAge: 50\nSex: Male\nBP: 140/90\nDiabetes" # Fallback for prototype if pypdf not installed
             
     def _extract_from_image(self, content: bytes) -> str:
+        import os
+        from dotenv import load_dotenv
+        
+        load_dotenv()
+        gemini_api_key = os.getenv("GEMINI_API_KEY")
+        
+        if gemini_api_key:
+            try:
+                import google.generativeai as genai
+                from PIL import Image
+                import io
+                
+                genai.configure(api_key=gemini_api_key)
+                # Use gemini-1.5-flash which is fast and supports vision
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                img = Image.open(io.BytesIO(content))
+                
+                prompt = "Extract all text from this clinical document exactly as written. Preserve numbers and labels clearly. Do not add conversational text."
+                response = model.generate_content([prompt, img])
+                return response.text
+            except Exception as e:
+                print(f"Gemini API failed: {e}")
+                pass # Fallback to tesseract
+                
         try:
             import pytesseract
             from PIL import Image
