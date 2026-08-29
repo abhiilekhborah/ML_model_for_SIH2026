@@ -59,17 +59,20 @@ class DocumentExtractor:
         
         if gemini_api_key:
             try:
-                import google.generativeai as genai
+                from google import genai
                 from PIL import Image
                 import io
                 
-                genai.configure(api_key=gemini_api_key)
-                # Use gemini-1.5-flash which is fast and supports vision
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                # Use the new official google-genai SDK
+                client = genai.Client(api_key=gemini_api_key.strip())
                 img = Image.open(io.BytesIO(content))
                 
                 prompt = "Extract all text from this clinical document exactly as written. Preserve numbers and labels clearly. Do not add conversational text."
-                response = model.generate_content([prompt, img])
+                # Use the latest 3.6-flash model
+                response = client.models.generate_content(
+                    model='gemini-3.6-flash',
+                    contents=[prompt, img]
+                )
                 return response.text
             except Exception as e:
                 print(f"Gemini API failed: {e}")
