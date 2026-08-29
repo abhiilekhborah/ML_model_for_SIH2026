@@ -7,6 +7,10 @@ import logging
 
 app = FastAPI(title="MediQuick ML Risk Prediction Service")
 
+@app.get("/")
+async def root():
+    return {"status": "ok", "service": "MediQuick ML Risk Prediction", "version": "1.0.0"}
+
 document_extractor = DocumentExtractor()
 risk_aggregator = RiskAggregator()
 
